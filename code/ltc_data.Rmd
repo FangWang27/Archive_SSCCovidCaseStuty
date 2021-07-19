@@ -1,0 +1,98 @@
+---
+title: "forecasting-2"
+author: "Ruyi Pan"
+date: "06/12/2020"
+output: html_document
+---
+```{r}
+library("mgcv")
+require("dplyr")
+require("ggplot2")
+```
+
+
+```{r}
+ltc <- read.csv("ltccovidsummary.csv")
+ltc_resident <- ltc["Total_LTC_Resident_Deaths"]
+ltc_hcw <- ltc["Total_LTC_HCW_Deaths"]
+```
+
+```{r}
+ltc
+```
+
+
+```{r}
+#get the difference death between two days
+res_diff <- ltc_resident[-1, ] - ltc_resident[-nrow(ltc_resident), ]
+hcw_diff <- ltc_hcw[-1,]-ltc_hcw[-nrow(ltc_hcw),]
+daily_death <- res_diff+hcw_diff
+daily_death[daily_death<0] <- 0
+daily_death
+```
+
+```{r}
+date <- ltc["Report_Data_Extracted"]
+date<- format(as.Date(date$ï..Report_Data_Extracted), '%m/%d/%Y')
+date <- date[2:length(date)]
+```
+
+
+
+```{r}
+ltc_1 <- ltc["Confirmed_Active_LTC_Resident_Cases"]
+ltc_2<- ltc["Confirmed_Active_LTC_HCW_Cases"]
+
+confirmed_cases <- ltc_1+ltc_2
+confirmed_cases
+cases <- confirmed_cases$Confirmed_Active_LTC_Resident_Cases[1:(length(confirmed_cases$Confirmed_Active_LTC_Resident_Cases)-1)]
+#get the difference cases between two days
+res_case_diff <- ltc_resident_case[-1, ] - ltc_resident_case[-nrow(ltc_resident_case), ]
+hcw_case_diff <- ltc_hcw_case[-1,]-ltc_hcw_case[-nrow(ltc_hcw_case),]
+daily_case <- res_case_diff+hcw_case_diff
+```
+
+```{r}
+ontario_ltc_daily_death <- data.frame(date, daily_death,cases)
+write.csv(ontario_ltc_daily_death , file = "ontario_ltc_daily_death.csv",row.names = FALSE)
+ontario_ltc_daily_death$day <-c(1:length(ontario_ltc_daily_death$date))
+ontario_ltc_daily_death
+```
+
+```{r}
+deathsGam_lt<- gam(daily_death ~  offset(log(cases ))+s(day, k=20) , data = ontario_ltc_daily_death,family="nb", method="ml")
+summary(deathsGam_lt)$p.table
+newX1=ontario_ltc_daily_death
+deathsPred_lt1 = predict(deathsGam_lt, newX1, se.fit = TRUE)
+deathsPred_lt1 = cbind(newX1, deathsPred_lt1)
+deathsPred_lt1$lower = deathsPred_lt1$fit - 2 * deathsPred_lt1$se.fit
+deathsPred_lt1$upper = deathsPred_lt1$fit + 2 * deathsPred_lt1$se.fit 
+
+
+for (D in c("fit", "lower", "upper")) {
+  deathsPred_lt1[[paste(D, "exp", sep = "")]] = exp(deathsPred_lt1[[D]]) }
+
+#newX2=final_long_term[final_long_term$is_longterm==0,]
+#deathsPred_lt2 = predict(deathsGam_lt, newX2, se.fit = TRUE)
+#deathsPred_lt2 = cbind(newX2, deathsPred_lt2)
+#deathsPred_lt2$lower = deathsPred_lt2$fit - 2 * deathsPred_lt2$se.fit
+#deathsPred_lt2$upper = deathsPred_lt2$fit + 2 * deathsPred_lt2$se.fit 
+
+
+#for (D in c("fit", "lower", "upper")) {
+#  deathsPred_lt2[[paste(D, "exp", sep = "")]] = exp(deathsPred_lt2[[D]]) }
+
+
+par(mfrow=c(1,1))
+plot(ontario_ltc_daily_death$day,ontario_ltc_daily_death$daily_death, type="l", xlim= c(1, 300),log="y", ylim =c(0.5,600),col="blue" , xlab="Week", ylab="log_death", main="Long_term")
+points(deathsPred_lt1$day, deathsPred_lt1$fitexp, type= "l",col="red")
+matlines(deathsPred_lt1$day, deathsPred_lt1[, c("lowerexp",
+"upperexp", "fitexp")], lty = 1, col = c("grey",
+"grey", "red"), lwd = c(2, 2, 1))
+#plot(final_long_term$time_week[final_long_term$is_longterm==0], final_long_term$counts[final_long_term$is_longterm==0], type="l", xlim= c(1, 50),log="y", ylim =c(0.5,700),col="green" , xlab="Week", ylab="log_death", main="Not_Long_term")
+#points(deathsPred_lt2$time_week, deathsPred_lt2$fitexp, type="l", col="red")
+#matlines(deathsPred_lt2$time_week, deathsPred_lt2[, c("lowerexp",
+# "upperexp", "fitexp")], lty = 1, col = c("grey",
+#"#grey", "red"), lwd = c(2, 2, 1))
+```
+

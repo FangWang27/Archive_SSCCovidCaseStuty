@@ -1,0 +1,83 @@
+\documentclass{report}
+\usepackage{amsmath}
+%\usepackage{amssymb} # it does not work with MnSymbol
+\usepackage{amsthm,mathrsfs}
+\usepackage{enumitem}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{cite}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{cprotect}
+\usepackage{graphicx}
+\graphicspath{ {figures/} }
+%Font used for low resolution printer, i.e 
+\usepackage[no-math]{fontspec}
+\usepackage{fourier}
+\usepackage{MnSymbol}
+\setmainfont{Linux Libertine O} 
+%------------------------------
+\author{Fang Wang}
+\title{ \textbf{\huge{Covid Project}}} 
+
+\begin{document}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\sumi}[2][1]{\sum\limits_{i=#1}^{#2}}
+\newcommand{\sumk}[2][1]{\sum\limits_{k=#1}^{#2}}
+\newcommand{\sumj}[2][1]{\sum\limits_{j=#1}^{#2}}
+\newcommand{\sumx}[2][1]{\sum\limits_{x=#1}^{#2}}
+\newcommand{\sumn}[2][1]{\sum\limits_{n=#1}^{#2}}
+\newcommand{\prodi}[2][1]{\prod\limits_{i=#1}^{#2}}
+\newcommand{\prodk}[2][1]{\prod\limits_{k=#1}^{#2}}
+\newcommand{\prodj}[2][1]{\prod\limits_{j=#1}^{#2}}
+\newcommand{\E}[2][]{ \mathbb{E}_{#1} \left[ #2 \right]}
+\newcommand{\Var}[1]{ \mathrm{Var} \left[ #1 \right]}
+\newcommand{\Cov}[1]{ \mathrm{Cov} \left[ #1 \right]}
+\renewcommand{\P}[2][]{ \mathbb{P}_{#1} \left( #2 \right)}
+\newcommand{\iidis}{\stackrel{iid}{\sim}}
+\newcommand{\toP}{\stackrel{P}{\to}}
+\newcommand{\toD}{\stackrel{\mathrm{D}}{\to}}
+\newcommand{\eqD}{\stackrel{\mathrm{D}}{=}}
+\newcommand{\toas}{\stackrel{\mathrm{a.s}}{\to}}
+\newcommand{\I}[1]{\mathbb 1_{\{#1\}}}
+\newtheorem{thm}{Theorem}[chapter]
+\newtheorem{prop}{Proposition}[chapter]
+\newtheorem{lem}{Lemma}[chapter]
+\newtheorem{cor}{Corollary}[chapter]
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[chapter]
+\newtheorem{eg}{Example}[chapter]
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\maketitle
+
+\chapter{Introduction} \label{chapter intro}
+
+More than fifteen thousands of deaths in Canada are linked to the ongoing pandanmic caused by the coronavirus disease 2019 (COVID-19) \cite{dong2020interactive}, many of which are the residents
+in long term care center (LTH). 
+
+
+
+\chapter{Data and Methods} \label{chapter methods}
+
+
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{ref}
+\end{document}

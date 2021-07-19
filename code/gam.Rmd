@@ -1,0 +1,31 @@
+---
+title: "Untitled"
+author: "Ruyi Pan"
+date: "01/11/2020"
+output: html_document
+---
+
+```{r}
+week_total <- read.csv("week_total.csv")
+colnames(week_total)[2] <- "count"
+week_total <- week_total[week_total$week_index < 99,]
+library("mgcv")
+deathsGam <- gam(count ~  s(week_index) , data = week_total,family="poisson")
+summary(deathsGam)$p.table
+newX <- data.frame(week_index = seq(1:10) + max(week_total$week_index))
+newX$timeNumeric <- newX$week_index*7
+
+deathsPred <- predict(deathsGam, newX, se.fit = TRUE)
+deathsPred <- cbind(newX, deathsPred)
+deathsPred$lower <- deathsPred$fit - 2 * deathsPred$se.fit
+deathsPred$upper <- deathsPred$fit + 2 * deathsPred$se.fit 
+for (D in c("fit", "lower", "upper")) {
+  deathsPred[[paste(D, "exp", sep = "")]] <- exp(deathsPred[[D]]) }
+
+plot(week_total$week_index, week_total$count, type="l", xlim= c(1, 50),log = 'y', ylim =c(0.5,1000) )
+points(deathsPred$week_index, deathsPred[, "fitexp"], type="l", col="red")
+matlines(deathsPred$week_index, deathsPred[, c("lowerexp",
+ "upperexp", "fitexp")], lty = 1, col = c("grey",
+"grey", "red"), lwd = c(2, 2, 1))
+```
+
